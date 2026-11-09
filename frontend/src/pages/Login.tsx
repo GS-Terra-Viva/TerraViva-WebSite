@@ -1,12 +1,9 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 
 function Login() {
-  const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Estados dos campos
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -35,7 +32,6 @@ function Login() {
         return;
       }
 
-      navigate('/dashboard');
     } catch (err) {
       // Erro de conexão/configuração, não de credenciais
       console.error('Erro ao consultar o Supabase:', err);
