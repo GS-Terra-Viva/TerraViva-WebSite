@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import {
   login as authLogin,
+  register as authRegister,
   getSession,
   logout as authLogout,
 } from "../services/authService";
@@ -24,6 +25,11 @@ export const useAuth = () => {
     return user;
   };
 
+  const register = async (name: string, email: string, password: string) => {
+    await authRegister(name, email, password);
+    return login(name, password);
+  };
+
   const logout = () => {
     authLogout();
     navigate("/login");
@@ -39,6 +45,7 @@ export const useAuth = () => {
 
   return {
     login,
+    register,
     logout,
     isAuthenticated,
     isAdmin,

@@ -72,3 +72,8 @@ export function logout() {
     supabase.rpc('logout_usuario', { p_token: local.token }).then(() => {})
   }
 }
+
+export async function register(name: string, email: string, password: string): Promise<void> {
+  const { error } = await supabase.from('usuarios').insert({ name, email, password })
+  if (error) throw error
+}
