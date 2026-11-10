@@ -5,6 +5,8 @@ import Register from "./pages/Register"
 import Home from './pages/Home'
 import Error from './pages/Error'
 import PrivateRoute from "./components/PrivateRoute"
+import Denuncias from './pages/Denuncias'
+import NovaDenuncia from './pages/NovaDenuncia'
 
 const App = () => {
   return (
@@ -14,11 +16,20 @@ const App = () => {
         <Route path='/' element={<Home/>}/>
         <Route path='/login' element={<Login/>}/>
         <Route path='/register' element={<Register/>}/>
+        <Route path='/denuncias' element={<Denuncias/>}/>
         <Route
           path="/dashboard"
           element={
             <PrivateRoute allowedRoles={['admin']}>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/nova-denuncia"
+          element={
+            <PrivateRoute allowedRoles={['user','admin']}>	
+              <NovaDenuncia />
             </PrivateRoute>
           }
         />

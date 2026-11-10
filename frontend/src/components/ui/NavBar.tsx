@@ -28,6 +28,7 @@ const Navbar = () => {
           </span>
         </Link>
       )}
+      <Link to="/denuncias">Denúncias</Link>
     </header>
   );
 };

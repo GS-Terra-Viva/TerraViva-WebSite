@@ -10,7 +10,9 @@ import { useAuth } from "../../hooks/useAuth";
 const UserMenu = () => {
   const [aberto, setAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { logout, isAdmin } = useAuth();
+  const { logout, isAdmin, getSession } = useAuth();
+  const user = getSession();
+
 
   useEffect(() => {
     const handleClickFora = (event: MouseEvent) => {
@@ -37,7 +39,7 @@ const UserMenu = () => {
         aria-label="Abrir menu do usuário"
         aria-expanded={aberto}
       >
-        <CircleUserRound className="h-8 w-8" />
+        <CircleUserRound className="h-8 w-8" />{user?.name}
       </button>
 
       <div>
