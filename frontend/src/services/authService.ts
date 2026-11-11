@@ -77,3 +77,27 @@ export async function register(name: string, email: string, password: string): P
   const { error } = await supabase.from('usuarios').insert({ name, email, password })
   if (error) throw error
 }
+
+export type UsuarioLista = {
+  id: number
+  name: string
+  email: string
+  role: UserRole
+}
+
+export async function listarUsuarios(): Promise<UsuarioLista[]> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { data, error } = await supabase.rpc('listar_usuarios', { p_token: local.token })
+  if (error) throw error
+  return (data ?? []) as UsuarioLista[]
+}
+
+export async function excluirUsuario(id: number): Promise<void> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { error } = await supabase.rpc('excluir_usuario', { p_token: local.token, p_id: id })
+  if (error) throw error
+}
