@@ -7,6 +7,8 @@ import Error from './pages/Error'
 import PrivateRoute from "./components/PrivateRoute"
 import Denuncias from './pages/Denuncias'
 import NovaDenuncia from './pages/NovaDenuncia'
+import DashboardDenuncias from './pages/DashboardDenuncias'
+import DashboardUsuarios from './pages/DashboardUsuarios'
 
 const App = () => {
   return (
@@ -23,6 +25,22 @@ const App = () => {
           element={
             <PrivateRoute allowedRoles={['admin']}>
               <Dashboard />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/denuncias"
+          element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <DashboardDenuncias />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/dashboard/usuarios"
+          element={
+            <PrivateRoute allowedRoles={['admin']}>
+              <DashboardUsuarios />
             </PrivateRoute>
           }
         />

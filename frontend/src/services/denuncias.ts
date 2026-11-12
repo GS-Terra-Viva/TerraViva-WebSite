@@ -93,3 +93,77 @@ export async function criarDenuncia(d: NovaDenunciaInput): Promise<DenunciaCriad
   }
   return criada
 }
+
+/* ------------------------------------------------------------------ */
+/* Painel administrativo                                               */
+/* ------------------------------------------------------------------ */
+
+export type StatusDenuncia = 'recebida' | 'em_analise' | 'encaminhada' | 'concluida'
+
+export const STATUS_DENUNCIA: Record<StatusDenuncia, string> = {
+  recebida: 'Recebida',
+  em_analise: 'Em análise',
+  encaminhada: 'Encaminhada',
+  concluida: 'Concluída',
+}
+
+/** Linha da tabela `denuncias` como o painel a consome. */
+export type DenunciaLista = {
+  id: number
+  protocolo: string
+  tipo: TipoOcorrencia
+  data_ocorrido: string // yyyy-mm-dd
+  titulo: string
+  comunidade: string | null
+  descricao: string
+  municipio: string
+  municipio_ibge: number | null
+  lat: number | null
+  lng: number | null
+  usuario_id: number | null
+  usuario_nome: string | null
+  usuario_email: string | null
+  status: StatusDenuncia
+  created_at: string // timestamptz ISO
+}
+
+/**
+ * Lista todas as denúncias (somente admin).
+ * Espera a RPC `listar_denuncias(p_token)` devolvendo as colunas de `DenunciaLista`.
+ */
+export async function listarDenuncias(): Promise<DenunciaLista[]> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { data, error } = await supabase.rpc('listar_denuncias', { p_token: local.token })
+  if (error) throw error
+  return (data ?? []) as DenunciaLista[]
+}
+
+/**
+ * Arquiva uma denúncia (somente admin).
+ * Espera a RPC `arquivar_denuncia(p_token, p_id)`.
+ */
+export async function arquivarDenuncia(id: number): Promise<void> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { error } = await supabase.rpc('arquivar_denuncia', { p_token: local.token, p_id: id })
+  if (error) throw error
+}
+
+export async function atualizarStatusDenuncia(
+  id: number,
+  status: StatusDenuncia
+): Promise<void> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { error } = await supabase.rpc('atualizar_status_denuncia', {
+    p_token: local.token,
+    p_id: id,
+    p_status: status,
+  })
+
+  if (error) throw error
+}
