@@ -81,6 +81,22 @@ export default function DenunciaModal({ denuncia: d, onFechar }: Props) {
             </Campo>
           </div>
 
+          {d.mensagem_encaminhamento && (
+            <div className="sm:col-span-2">
+              <Campo rotulo="Informações do encaminhamento">
+                <p className="whitespace-pre-wrap">{d.mensagem_encaminhamento}</p>
+              </Campo>
+            </div>
+          )}
+
+          {d.mensagem_conclusao && (
+            <div className="sm:col-span-2">
+              <Campo rotulo="Informações da conclusão">
+                <p className="whitespace-pre-wrap">{d.mensagem_conclusao}</p>
+              </Campo>
+            </div>
+          )}
+
           <div className="sm:col-span-2 p-4 rounded-md bg-[#f4f3ee]">
             <p className="text-[11px] font-bold tracking-wide text-gray-500 uppercase">
               Registrada por

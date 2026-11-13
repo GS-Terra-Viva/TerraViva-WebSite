@@ -281,7 +281,7 @@ function Denuncias() {
             <input
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
-              placeholder="Buscar título ou protocolo"
+              placeholder="Buscar título"
               className="rounded-md border px-3 py-2"
             />
 
@@ -387,10 +387,6 @@ function Denuncias() {
 
                   <p className="mt-2 text-sm">
                     {d.comunidade ? `${d.comunidade}, ` : ''}{d.municipio}
-                  </p>
-
-                  <p className="mt-1 text-xs text-gray-500">
-                    Protocolo: {d.protocolo}
                   </p>
 
                   <p className="mt-1 text-xs text-gray-500">

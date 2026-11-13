@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   CircleUserRound,
+  FileText,
   LayoutDashboard,
   LogOut,
 } from "lucide-react";
@@ -10,7 +11,7 @@ import { useAuth } from "../../hooks/useAuth";
 const UserMenu = () => {
   const [aberto, setAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { logout, isAdmin, getSession } = useAuth();
+  const { logout, isAdmin, getSession, isAuthenticated } = useAuth();
   const user = getSession();
 
 
@@ -54,6 +55,14 @@ const UserMenu = () => {
             >
               <LayoutDashboard className="h-4 w-4" />
               Ver Dashboard
+            </Link>)}
+            {isAuthenticated() && (<Link
+              to="/minhas-denuncias"
+              onClick={() => setAberto(false)}
+              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
+            >
+              <FileText className="h-4 w-4" />
+              Minhas denúncias
             </Link>)}
 
             <button

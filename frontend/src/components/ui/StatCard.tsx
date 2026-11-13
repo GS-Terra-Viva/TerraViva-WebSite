@@ -2,7 +2,7 @@ type Props = {
     titulo: string
     valor: number | string
     legenda: string
-    corBorda: string // ex.: 'border-green-800'
+    corBorda: string
   }
   
   export default function StatCard({ titulo, valor, legenda, corBorda }: Props) {

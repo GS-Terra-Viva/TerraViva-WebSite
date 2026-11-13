@@ -9,6 +9,8 @@ import Denuncias from './pages/Denuncias'
 import NovaDenuncia from './pages/NovaDenuncia'
 import DashboardDenuncias from './pages/DashboardDenuncias'
 import DashboardUsuarios from './pages/DashboardUsuarios'
+import MinhasDenuncias from './pages/MinhasDenuncias'
+import AcompanharDenuncia from './pages/AcompanharDenuncias'
 
 const App = () => {
   return (
@@ -49,6 +51,22 @@ const App = () => {
           element={
             <PrivateRoute allowedRoles={['user','admin']}>	
               <NovaDenuncia />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/minhas-denuncias"
+          element={
+            <PrivateRoute allowedRoles={['user','admin']}>	
+              <MinhasDenuncias />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/minhas-denuncias/:protocolo"
+          element={
+            <PrivateRoute allowedRoles={['user','admin']}>	
+              <AcompanharDenuncia />
             </PrivateRoute>
           }
         />

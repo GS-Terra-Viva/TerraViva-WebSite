@@ -109,6 +109,8 @@ export const STATUS_DENUNCIA: Record<StatusDenuncia, string> = {
 
 /** Linha da tabela `denuncias` como o painel a consome. */
 export type DenunciaLista = {
+  mensagem_conclusao: string 
+  mensagem_encaminhamento: string 
   id: number
   protocolo: string
   tipo: TipoOcorrencia
@@ -165,5 +167,38 @@ export async function atualizarStatusDenuncia(
     p_status: status,
   })
 
+  if (error) throw error
+}
+
+export const ORDEM_STATUS: StatusDenuncia[] = ['recebida', 'em_analise', 'encaminhada', 'concluida']
+
+export function proximoStatus(atual: StatusDenuncia): StatusDenuncia | null {
+  return ORDEM_STATUS[ORDEM_STATUS.indexOf(atual) + 1] ?? null
+}
+
+/** Status que exigem uma mensagem sobre o processo do admin. */
+export const STATUS_COM_MENSAGEM: StatusDenuncia[] = ['encaminhada', 'concluida']
+export const MENSAGEM_MIN = 10
+
+/**
+ * Avança o status de uma denúncia (somente admin).
+ * Para "encaminhada" e "concluida" a mensagem é obrigatória e é gravada na coluna
+ * própria de cada etapa (mensagem_encaminhamento / mensagem_conclusao).
+ * Espera a RPC `alterar_status_denuncia(p_token, p_id, p_status, p_mensagem)`.
+ */
+export async function alterarStatusDenuncia(
+  id: number,
+  status: StatusDenuncia,
+  mensagem?: string,
+): Promise<void> {
+  const local = getSession()
+  if (!local) throw new Error('sessao_invalida')
+
+  const { error } = await supabase.rpc('alterar_status_denuncia', {
+    p_token: local.token,
+    p_id: id,
+    p_status: status,
+    p_mensagem: mensagem?.trim() || null,
+  })
   if (error) throw error
 }
