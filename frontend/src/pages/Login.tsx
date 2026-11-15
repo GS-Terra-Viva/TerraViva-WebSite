@@ -69,15 +69,15 @@ function Login() {
           <div className="flex-1 bg-red-700" />
         </div>
 
-        <div className="flex flex-col shrink-0 px-12 pt-10 pb-10">
+        <div className="flex flex-col shrink-0 px-12 pt-6 pb-4">
           <p className="text-sm font-bold tracking-wide text-yellow-500">TERRITÓRIO É VIDA.</p>
-          <h2 className="mt-4 text-3xl font-bold leading-tight text-[#f6efd8]">
+          <h2 className="mt-2 text-3xl font-bold leading-tight text-[#f6efd8]">
             A sua voz faz parte dessa resistência.
           </h2>
-          <p className="mt-6 max-w-md text-base text-gray-300">
+          <p className="mt-3 max-w-md text-base text-gray-300">
             Entre para registrar denúncias e acompanhar os próximos passos de cada relato.
           </p>
-          <p className="mt-9 text-xs tracking-wide text-gray-400">TERRA VIVA / SÃO PAULO</p>
+          <p className="mt-6 text-xs tracking-wide text-gray-400">TERRA VIVA / SÃO PAULO</p>
         </div>
       </aside>
 
