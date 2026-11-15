@@ -1,8 +1,10 @@
+import AdminLayout from '../components/layout/AdminLayout'
+
 const Dashboard = () => {
   return (
-    <div>
-      Dashboard
-    </div>
+    <AdminLayout titulo="Visão geral">
+      <main className="p-6 md:p-10" />
+    </AdminLayout>
   )
 }
 

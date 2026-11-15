@@ -1,14 +1,39 @@
+import { useEffect, useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { verifySession, type AppUser, type UserRole } from "../services/authService";
+import Error from "../pages/Error";
 
-const PrivateRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+type PrivateRouteProps = {
+  children: ReactNode;
+  allowedRoles?: UserRole[];
+};
 
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
+const PrivateRoute = ({ children, allowedRoles }: PrivateRouteProps) => {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let ativo = true;
+
+    verifySession()
+      .then((u) => ativo && setUser(u))
+      .catch(() => ativo && setUser(null))
+      .finally(() => ativo && setLoading(false));
+
+    return () => {
+      ativo = false;
+    };
+  }, []);
+
+  if (loading) return <div>Carregando...</div>;
+
+  if (!user) return <Navigate to="/login" replace />;
+
+  if (allowedRoles && !allowedRoles.includes(user.role)) {
+    return <Error/>;
   }
 
   return children;
 };
 
-export default PrivateRoute;
+export default PrivateRoute;  

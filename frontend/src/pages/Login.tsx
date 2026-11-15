@@ -1,12 +1,10 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
+import { Link } from 'react-router-dom';
 
 function Login() {
-  const navigate = useNavigate();
   const { login } = useAuth();
 
-  // Estados dos campos
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
@@ -35,7 +33,6 @@ function Login() {
         return;
       }
 
-      navigate('/dashboard');
     } catch (err) {
       // Erro de conexão/configuração, não de credenciais
       console.error('Erro ao consultar o Supabase:', err);
@@ -121,6 +118,9 @@ function Login() {
           </button>
 
         </form>
+        <p className="mt-6 text-center text-sm text-gray-400">
+  Não tem conta? <Link to="/register" className="text-blue-400 hover:underline">Cadastre-se</Link>
+</p>
 
       </div>
     </div>
