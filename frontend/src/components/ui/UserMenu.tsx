@@ -1,8 +1,8 @@
+
 import { useState, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import {
   CircleUserRound,
-  FileText,
   LayoutDashboard,
   LogOut,
 } from "lucide-react";
@@ -11,9 +11,7 @@ import { useAuth } from "../../hooks/useAuth";
 const UserMenu = () => {
   const [aberto, setAberto] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const { logout, isAdmin, getSession, isAuthenticated } = useAuth();
-  const user = getSession();
-
+  const { logout } = useAuth();
 
   useEffect(() => {
     const handleClickFora = (event: MouseEvent) => {
@@ -40,7 +38,7 @@ const UserMenu = () => {
         aria-label="Abrir menu do usuário"
         aria-expanded={aberto}
       >
-        <CircleUserRound className="h-8 w-8" />{user?.name}
+        <CircleUserRound className="h-8 w-8" />
       </button>
 
       <div>
@@ -48,22 +46,14 @@ const UserMenu = () => {
           <nav
             className="absolute right-0 top-12 z-50 flex w-44 flex-col gap-1 rounded-xl border border-(--card-border-color1) bg-white p-2 shadow-lg dark:bg-(--background-color-dark) dark:border-(--card-border-color1-dark)"
           >
-            {isAdmin() && (<Link
+            <Link
               to="/dashboard"
               onClick={() => setAberto(false)}
               className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
             >
               <LayoutDashboard className="h-4 w-4" />
               Ver Dashboard
-            </Link>)}
-            {isAuthenticated() && (<Link
-              to="/minhas-denuncias"
-              onClick={() => setAberto(false)}
-              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
-            >
-              <FileText className="h-4 w-4" />
-              Minhas denúncias
-            </Link>)}
+            </Link>
 
             <button
               onClick={() => {
