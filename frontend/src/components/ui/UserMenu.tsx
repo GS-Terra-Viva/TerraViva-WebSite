@@ -36,22 +36,22 @@ const UserMenu = () => {
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => setAberto(!aberto)}
-        className="flex items-center justify-center rounded-full p-1 transition-colors cursor-pointer hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
+        className="flex items-center justify-center rounded-full p-1 transition-colors cursor-pointer text-[#EEE2D0] gap-2"
         aria-label="Abrir menu do usuário"
         aria-expanded={aberto}
       >
-        <CircleUserRound className="h-8 w-8" />{user?.name}
+        <CircleUserRound className="h-8 w-8 text-[#EEE2D0]"/>{user?.name}
       </button>
 
       <div>
         {aberto && (
           <nav
-            className="absolute right-0 top-12 z-50 flex w-44 flex-col gap-1 rounded-xl border border-(--card-border-color1) bg-white p-2 shadow-lg dark:bg-(--background-color-dark) dark:border-(--card-border-color1-dark)"
+            className="absolute top-12 z-50 flex w-max flex-col gap-1 rounded-lg p-2 shadow-lg border border-white/10 bg-black text-[#EEE2D0]"
           >
             {isAdmin() && (<Link
               to="/dashboard"
               onClick={() => setAberto(false)}
-              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
+              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-[#f2d4a743]"
             >
               <LayoutDashboard className="h-4 w-4" />
               Ver Dashboard
@@ -59,7 +59,7 @@ const UserMenu = () => {
             {isAuthenticated() && (<Link
               to="/minhas-denuncias"
               onClick={() => setAberto(false)}
-              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-(--background-color-dark)/10 dark:hover:bg-(--background-color)/10"
+              className="flex items-center gap-2 rounded-lg p-2 transition-colors hover:bg-[#f2d4a743]"
             >
               <FileText className="h-4 w-4" />
               Minhas denúncias
@@ -70,7 +70,7 @@ const UserMenu = () => {
                 setAberto(false);
                 logout();
               }}
-              className="flex cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-red-600 transition-colors hover:bg-red-50 dark:hover:bg-red-500/10"
+              className="flex cursor-pointer items-center gap-2 rounded-lg p-2 text-left text-red-600 transition-colors hover:bg-red-300/30"
             >
               <LogOut className="h-4 w-4" />
               Sair
