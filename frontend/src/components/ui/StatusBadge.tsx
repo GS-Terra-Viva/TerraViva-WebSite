@@ -5,29 +5,30 @@ import { STATUS_DENUNCIA, type StatusDenuncia } from '../../services/denuncias'
 
 const estilos: Record<StatusDenuncia, { pill: string; dot: string }> = {
   recebida: {
-    pill: 'bg-blue-50 text-blue-800 border-blue-200',
-    dot: 'bg-blue-600',
+    pill: 'bg-[#EDF1E8] text-[#687C51] border-[#687C51]',
+    dot: 'bg-[#687C51]',
   },
   em_analise: {
-    pill: 'bg-amber-50 text-amber-800 border-amber-200',
-    dot: 'bg-amber-500',
+    pill: 'bg-[#FBEAE7] text-[#A71E0C] border-[#A71E0C]',
+    dot: 'bg-[#A71E0C]',
   },
   encaminhada: {
-    pill: 'bg-purple-50 text-purple-800 border-purple-200',
-    dot: 'bg-purple-600',
+    pill: 'bg-[#FFF4D6] text-[#85630E] border-[#C49A32]',
+    dot: 'bg-[#C49A32]',
   },
   concluida: {
-    pill: 'bg-green-50 text-green-800 border-green-200',
-    dot: 'bg-green-700',
+    pill: 'bg-[#E5F3E9] text-[#287044] border-[#287044]',
+    dot: 'bg-[#287044]',
   },
 }
 
 export const COR_STATUS = {
-  recebida: 'border-blue-600',
-  em_analise: 'border-amber-500',
-  encaminhada: 'border-purple-600',
-  concluida: 'border-green-800',
+  recebida: 'border-[#687C51]',
+  em_analise: 'border-[#A71E0C]',
+  encaminhada: 'border-[#C49A32]',
+  concluida: 'border-[#287044]',
 } as const
+
 
 type Props = {
   status: StatusDenuncia
