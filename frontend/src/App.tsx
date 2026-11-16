@@ -1,4 +1,5 @@
-import {BrowserRouter as Router,Routes,Route} from 'react-router-dom'
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+
 import Dashboard from "./pages/Dashboard"
 import Login from "./pages/Login"
 import Register from "./pages/Register"
@@ -12,18 +13,19 @@ import DashboardUsuarios from './pages/DashboardUsuarios'
 import MinhasDenuncias from './pages/MinhasDenuncias'
 import AcompanharDenuncia from './pages/AcompanharDenuncias'
 import ComoFunciona from './pages/ComoFunciona'
+import Projeto from './pages/Projeto'
 
 const App = () => {
   return (
-    <>
     <Router>
       <Routes>
-        <Route path='/' element={<Home/>}/>
-        <Route path='/login' element={<Login/>}/>
-        <Route path='/register' element={<Register/>}/>
-        <Route path='/denuncias' element={<Denuncias/>}/>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/denuncias" element={<Denuncias />} />
         <Route path="/como-funciona" element={<ComoFunciona />} />
+        <Route path="/sobre" element={<Projeto />} />
+
         <Route
           path="/dashboard"
           element={
@@ -32,6 +34,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/dashboard/denuncias"
           element={
@@ -40,6 +43,7 @@ const App = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/dashboard/usuarios"
           element={
@@ -48,34 +52,37 @@ const App = () => {
             </PrivateRoute>
           }
         />
+
         <Route
           path="/nova-denuncia"
           element={
-            <PrivateRoute allowedRoles={['user','admin']}>	
+            <PrivateRoute allowedRoles={['user', 'admin']}>
               <NovaDenuncia />
             </PrivateRoute>
           }
         />
+
         <Route
           path="/minhas-denuncias"
           element={
-            <PrivateRoute allowedRoles={['user','admin']}>	
+            <PrivateRoute allowedRoles={['user', 'admin']}>
               <MinhasDenuncias />
             </PrivateRoute>
           }
         />
+
         <Route
           path="/minhas-denuncias/:protocolo"
           element={
-            <PrivateRoute allowedRoles={['user','admin']}>	
+            <PrivateRoute allowedRoles={['user', 'admin']}>
               <AcompanharDenuncia />
             </PrivateRoute>
           }
         />
-        <Route path='*' element={<Error/>}/>
+
+        <Route path="*" element={<Error />} />
       </Routes>
     </Router>
-    </>
   )
 }
 

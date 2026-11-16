@@ -1,24 +1,18 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Check } from 'lucide-react'
+import { ArrowLeft, Check, Copy } from 'lucide-react'
 
 import Navbar from '../components/ui/NavBar'
 import { TIPOS_OCORRENCIA, type TipoOcorrencia } from '../services/denuncias'
 import {
   ETAPAS,
-  buscarDenunciaPorProtocolo,
   fmtDataIso,
   fmtRecebida,
   identificarEtapa,
   type DenunciaPublica,
   type EtapaId,
 } from '../services/denunciasPublicas'
-
-type Estado =
-  | { tipo: 'carregando' }
-  | { tipo: 'erro' }
-  | { tipo: 'naoEncontrada' }
-  | { tipo: 'ok'; denuncia: DenunciaPublica }
+import { useDenunciaPorProtocolo } from '../hooks/useDenunciaPorProtocolo'
+import { useCopiarTexto } from '../hooks/useCopiarTexto'
 
 const COR_ETAPA: Record<EtapaId, string> = {
   recebida: 'bg-red-100 text-red-700',
@@ -42,32 +36,8 @@ function Campo({ rotulo, valor }: { rotulo: string; valor: string }) {
 const AcompanharDenuncia = () => {
   const { protocolo = '' } = useParams()
 
-  // Guarda de qual protocolo é o resultado, para não mostrar dados antigos ao trocar de protocolo
-  const [resultado, setResultado] = useState<{ para: string; estado: Estado } | null>(null)
-
-  useEffect(() => {
-    let ativo = true
-
-    buscarDenunciaPorProtocolo(protocolo)
-      .then((d) => {
-        if (!ativo) return
-        setResultado({
-          para: protocolo,
-          estado: d ? { tipo: 'ok', denuncia: d } : { tipo: 'naoEncontrada' },
-        })
-      })
-      .catch((e) => {
-        console.error(e)
-        if (ativo) setResultado({ para: protocolo, estado: { tipo: 'erro' } })
-      })
-
-    return () => {
-      ativo = false
-    }
-  }, [protocolo])
-
-  const estado: Estado =
-    resultado && resultado.para === protocolo ? resultado.estado : { tipo: 'carregando' }
+  // A consulta (loading, erro, não encontrada, ok) fica no hook
+  const estado = useDenunciaPorProtocolo(protocolo)
 
   return (
     <div className="min-h-screen bg-[#f6f7f0] text-gray-900">
@@ -76,15 +46,16 @@ const AcompanharDenuncia = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 my-20 md:p-8">
-      <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
-                  <Link to="/" className="hover:underline">
-                    Início
-                  </Link>{' '}/{' '}
-                  <Link to="/minhas-denuncias" className="hover:underline">
-                    Minhas Denúncias
-                  </Link>{' '}
-                  / <span>{protocolo}</span>
-                </nav>
+        <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+          <Link to="/" className="hover:underline">
+            Início
+          </Link>{' '}
+          /{' '}
+          <Link to="/minhas-denuncias" className="hover:underline">
+            Minhas Denúncias
+          </Link>{' '}
+          / <span>{protocolo}</span>
+        </nav>
         <h1 className="mt-2 text-4xl font-bold">Andamento da denúncia.</h1>
 
         <Link
@@ -126,6 +97,7 @@ function Detalhe({ denuncia: d }: { denuncia: DenunciaPublica }) {
   const etapa = identificarEtapa(d.status)
   const indice = etapa ? ETAPAS.findIndex((e) => e.id === etapa) : -1
   const info = etapa ? ETAPAS[indice] : null
+  const { copiado, copiar } = useCopiarTexto()
 
   // Uma mensagem por etapa, na ordem do processo (a conclusão nunca substitui o encaminhamento)
   const mensagens = [
@@ -133,14 +105,33 @@ function Detalhe({ denuncia: d }: { denuncia: DenunciaPublica }) {
     { id: 'concluida', titulo: 'Conclusão', texto: d.mensagemConclusao },
   ].filter((m): m is { id: string; titulo: string; texto: string } => !!m.texto?.trim())
 
-    console.log(d)
-
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
       {/* ---------------------------- Status ---------------------------- */}
       <section className="p-6 bg-white border border-gray-200 rounded-lg">
         <p className="text-xs font-bold tracking-wide text-gray-500">PROTOCOLO</p>
-        <p className="mt-1 text-2xl font-mono font-bold break-all">{d.protocolo}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <p className="text-2xl font-mono font-bold break-all">{d.protocolo}</p>
+
+          <button
+            type="button"
+            onClick={() => copiar(d.protocolo)}
+            className="inline-flex items-center gap-1.5 rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-bold text-green-800 hover:bg-gray-50"
+          >
+            {copiado ? (
+              <>
+                <Check size={14} /> Copiado!
+              </>
+            ) : (
+              <>
+                <Copy size={14} /> Copiar protocolo
+              </>
+            )}
+          </button>
+          <span role="status" className="sr-only">
+            {copiado ? 'Protocolo copiado' : ''}
+          </span>
+        </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <span
