@@ -38,7 +38,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="fixed z-50 w-full flex items-center justify-between bg-black px-8 py-2 md:px-20">
+    <header className="fixed z-500 w-full flex items-center justify-between bg-black px-8 py-2 md:px-20">
 
       {/* Logo */}
       <Link to="/" onClick={fecharMenu}>

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import * as L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import { MapPin, ShieldCheck, ArrowRight } from 'lucide-react'
@@ -14,6 +14,7 @@ import {
   type Municipio,
   type TipoOcorrencia,
 } from '../services/denuncias'
+import Footer from '../components/ui/Footer'
 
 type LatLng = { lat: number; lng: number }
 type Erros = Partial<
@@ -205,22 +206,26 @@ const NovaDenuncia = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="relative z-20 px-4 py-2 border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-[#f6f7f0] text-gray-900">
+      <div className="relative z-20 border-b border-gray-200 bg-white">
         <Navbar />
       </div>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-8">
-        <p className="text-xs font-bold tracking-wide text-green-800">DENÚNCIAS / NOVO REGISTRO</p>
+      <div className="max-w-6xl mx-auto px-4 my-20 md:p-8">
+      <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+                  <Link to="/" className="hover:underline">
+                    Início
+                  </Link>{' '}
+                  / <span>Nova Denúncia</span>
+                </nav>
         <h1 className="mt-2 text-4xl font-bold">O seu relato importa.</h1>
         <p className="mt-2 text-sm text-gray-600">
           Conte o que aconteceu. Quanto mais contexto, melhor será a análise.
         </p>
-        <p className="text-right text-xs text-gray-500">* Campos obrigatórios</p>
 
         {/* Tela de sucesso */}
         {protocolo ? (
-          <div className="mt-6 max-w-xl p-6 bg-white border border-green-200 rounded-lg space-y-3">
+          <div className="mt-6 max-w-xl p-6 bg-white rounded-lg space-y-3">
             <h2 className="text-xl font-bold text-green-800">Denúncia enviada!</h2>
             <p className="text-sm">Guarde o protocolo para acompanhar o relato:</p>
             <p className="text-2xl font-mono font-bold">{protocolo}</p>
@@ -239,7 +244,7 @@ const NovaDenuncia = () => {
           <form onSubmit={enviar} noValidate className="mt-4">
             <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-6 items-start">
               {/* ------------------ 01 · Sobre a ocorrência ------------------ */}
-              <section className="p-6 bg-white border border-gray-200 rounded-lg space-y-4">
+              <section className="p-6 bg-white rounded-lg space-y-4">
                 <header>
                   <h2 className="text-xl font-bold">
                     <span className="text-sm text-red-700 mr-3">01</span>
@@ -363,7 +368,7 @@ const NovaDenuncia = () => {
 
               {/* ------------------ 02 · Onde aconteceu ------------------ */}
               <div className="space-y-6">
-                <section className="p-6 bg-white border border-gray-200 rounded-lg space-y-4">
+                <section className="p-6 bg-white rounded-lg space-y-4">
                   <h2 className="text-xl font-bold">
                     <span className="text-sm text-red-700 mr-3">02</span>
                     Onde aconteceu?
@@ -393,7 +398,7 @@ const NovaDenuncia = () => {
 
                   <div
                     ref={mapDivRef}
-                    className="relative isolate z-0 h-64 w-full rounded border border-gray-200"
+                    className="relative isolate z-0 h-64 w-full rounded"
                   />
                   <p className="text-xs text-gray-600">Clique no mapa para marcar o local do ocorrido.</p>
 
@@ -477,7 +482,7 @@ const NovaDenuncia = () => {
                   type="button"
                   onClick={() => navigate('/denuncias')}
                   disabled={enviando}
-                  className="px-6 py-2.5 rounded bg-gray-200 hover:bg-gray-300 text-sm font-bold"
+                  className="px-6 py-2.5 rounded bg-white hover:bg-gray-50 text-sm font-bold"
                 >
                   Cancelar
                 </button>
@@ -494,6 +499,7 @@ const NovaDenuncia = () => {
           </form>
         )}
       </div>
+      <Footer/>
     </div>
   )
 }
