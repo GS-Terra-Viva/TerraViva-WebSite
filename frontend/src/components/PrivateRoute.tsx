@@ -2,6 +2,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { verifySession, type AppUser, type UserRole } from "../services/authService";
 import Error from "../pages/Error";
+import Carregando from "./ui/Carregando";
 
 type PrivateRouteProps = {
   children: ReactNode;
@@ -25,7 +26,7 @@ const PrivateRoute = ({ children, allowedRoles }: PrivateRouteProps) => {
     };
   }, []);
 
-  if (loading) return <div>Carregando...</div>;
+  if (loading) return <Carregando />;
 
   if (!user) return <Navigate to="/login" replace />;
 
