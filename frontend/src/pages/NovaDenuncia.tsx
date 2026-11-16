@@ -3,6 +3,7 @@ import { MapPin, ShieldCheck, ArrowRight } from 'lucide-react'
 
 import Navbar from '../components/ui/NavBar'
 import Footer from '../components/ui/Footer'
+import BotaoCopiar from '../components/ui/BotaoCopiar'
 import { TIPOS_OCORRENCIA, type TipoOcorrencia } from '../services/denuncias'
 import { chaveDia } from '../utils/formatters'
 import { useNovaDenuncia } from '../hooks/useNovaDenuncia'
@@ -63,7 +64,14 @@ const NovaDenuncia = () => {
           <div className="mt-6 max-w-xl p-6 bg-white rounded-lg space-y-3">
             <h2 className="text-xl font-bold text-green-800">Denúncia enviada!</h2>
             <p className="text-sm">Guarde o protocolo para acompanhar o relato:</p>
-            <p className="text-2xl font-mono font-bold">{protocolo}</p>
+            <div className="flex flex-wrap items-center gap-3">
+              <p className="text-2xl font-mono font-bold break-all">{protocolo}</p>
+              <BotaoCopiar
+                texto={protocolo}
+                rotulo="Copiar protocolo"
+                className="inline-flex items-center gap-1.5 rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-bold text-green-800 hover:bg-gray-50"
+              />
+            </div>
             <p className="text-sm text-gray-600">
               A equipe analisa as informações antes de atualizar o status da denúncia.
             </p>

@@ -1,5 +1,5 @@
 import { Link, useParams } from 'react-router-dom'
-import { ArrowLeft, Check } from 'lucide-react'
+import { ArrowLeft, Check, Copy } from 'lucide-react'
 
 import Navbar from '../components/ui/NavBar'
 import { TIPOS_OCORRENCIA, type TipoOcorrencia } from '../services/denuncias'
@@ -12,6 +12,7 @@ import {
   type EtapaId,
 } from '../services/denunciasPublicas'
 import { useDenunciaPorProtocolo } from '../hooks/useDenunciaPorProtocolo'
+import { useCopiarTexto } from '../hooks/useCopiarTexto'
 
 const COR_ETAPA: Record<EtapaId, string> = {
   recebida: 'bg-red-100 text-red-700',
@@ -96,6 +97,7 @@ function Detalhe({ denuncia: d }: { denuncia: DenunciaPublica }) {
   const etapa = identificarEtapa(d.status)
   const indice = etapa ? ETAPAS.findIndex((e) => e.id === etapa) : -1
   const info = etapa ? ETAPAS[indice] : null
+  const { copiado, copiar } = useCopiarTexto()
 
   // Uma mensagem por etapa, na ordem do processo (a conclusão nunca substitui o encaminhamento)
   const mensagens = [
@@ -108,7 +110,28 @@ function Detalhe({ denuncia: d }: { denuncia: DenunciaPublica }) {
       {/* ---------------------------- Status ---------------------------- */}
       <section className="p-6 bg-white border border-gray-200 rounded-lg">
         <p className="text-xs font-bold tracking-wide text-gray-500">PROTOCOLO</p>
-        <p className="mt-1 text-2xl font-mono font-bold break-all">{d.protocolo}</p>
+        <div className="mt-1 flex flex-wrap items-center gap-3">
+          <p className="text-2xl font-mono font-bold break-all">{d.protocolo}</p>
+
+          <button
+            type="button"
+            onClick={() => copiar(d.protocolo)}
+            className="inline-flex items-center gap-1.5 rounded border border-gray-300 bg-white px-3 py-1.5 text-xs font-bold text-green-800 hover:bg-gray-50"
+          >
+            {copiado ? (
+              <>
+                <Check size={14} /> Copiado!
+              </>
+            ) : (
+              <>
+                <Copy size={14} /> Copiar protocolo
+              </>
+            )}
+          </button>
+          <span role="status" className="sr-only">
+            {copiado ? 'Protocolo copiado' : ''}
+          </span>
+        </div>
 
         <div className="mt-5 flex flex-wrap items-center gap-3">
           <span
