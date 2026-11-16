@@ -16,6 +16,7 @@ import {
   type TipoOcorrencia,
 } from '../services/denuncias'
 import { chaveDia, formatarData } from '../utils/formatters'
+import { msgErro } from '../utils/erros'
 
 const DIAS = 7
 const DIA_CURTO = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
@@ -25,15 +26,6 @@ const COR_BARRA: Record<StatusDenuncia, string> = {
   em_analise: '#A71E0C',
   encaminhada: '#C49A32',
   concluida: '#287044', 
-}
-
-const msgErro = (e: unknown) => {
-  const m =
-    typeof e === 'object' && e !== null && 'message' in e
-      ? String((e as { message: unknown }).message)
-      : String(e)
-  if (m.includes('sessao_invalida')) return 'Sua sessão expirou. Entre novamente.'
-  return m
 }
 
 const Dashboard = () => {
