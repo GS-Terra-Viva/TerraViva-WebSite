@@ -22,6 +22,28 @@ export type DenunciaPublica = {
   recebidaEm: string
 }
 
+/** Denúncia como a RPC `listar_denuncias_publicas` devolve (usada no mapa público). */
+export type DenunciaMapa = {
+  id: string
+  protocolo: string
+  tipo: string
+  data_ocorrido: string
+  titulo: string
+  comunidade: string | null
+  municipio: string
+  lat: number | null
+  lng: number | null
+  status: string
+  created_at: string
+}
+
+/** Lista as denúncias públicas (não arquivadas, com coordenadas arredondadas). */
+export async function listarDenunciasPublicas(): Promise<DenunciaMapa[]> {
+  const { data, error } = await supabase.rpc('listar_denuncias_publicas')
+  if (error) throw error
+  return (data ?? []) as DenunciaMapa[]
+}
+
 // ---------------------------------------------------------------------------
 // Etapas de andamento (ids precisam bater com o status gravado no banco)
 // ---------------------------------------------------------------------------
@@ -45,7 +67,7 @@ export function identificarEtapa(status: string): EtapaId | null {
     .replace(/[\s-]+/g, '_')
 
   if (s === 'recebida' || s === 'recebido') return 'recebida'
-  if (s.startsWith('em_anala') || s === 'analise') return 'em_analise'
+  if (s.startsWith('em_anali') || s === 'analise') return 'em_analise'
   if (s.startsWith('encaminh')) return 'encaminhada'
   if (s.startsWith('conclu')) return 'concluida'
   return null

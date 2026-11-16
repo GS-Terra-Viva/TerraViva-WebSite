@@ -14,9 +14,11 @@ import {
   TIPOS_OCORRENCIA,
   type DenunciaLista,
   type StatusDenuncia,
-  type TipoOcorrencia,
 } from '../services/denuncias'
-import { chaveDia, formatarData, formatarDataHora } from '../utils/formatters'
+import { agruparPorDia, contarPorStatus } from '../utils/estatisticas'
+import { exportarCsv } from '../utils/exportarCsv'
+import { usePaginacao } from '../hooks/usePaginacao'
+import { useFiltroDenunciasAdmin } from '../hooks/useFiltroDenunciasAdmin'
 import { msgErro } from '../utils/erros'
 import { useDenuncias } from '../hooks/useDenuncias'
 
@@ -30,39 +32,13 @@ const PERIODOS = [
 const selectCls =
   'p-2.5 text-sm rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-700'
 
-const DIA_CURTO = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: 'short' })
-
-function exportarCsv(linhas: DenunciaLista[]) {
-  const cab = [
-    'Protocolo', 'Título', 'Tipo', 'Status', 'Data do ocorrido', 'Recebida em',
-    'Município', 'Comunidade', 'Descrição', 'Latitude', 'Longitude', 'Denunciante', 'E-mail',
-  ]
-  const esc = (v: unknown) => `"${String(v ?? '').replace(/"/g, '""')}"`
-  const corpo = linhas.map((d) =>
-    [
-      d.protocolo, d.titulo, TIPOS_OCORRENCIA[d.tipo] ?? d.tipo,
-      STATUS_DENUNCIA[d.status] ?? d.status, formatarData(d.data_ocorrido),
-      formatarDataHora(d.created_at), d.municipio, d.comunidade, d.descricao,
-      d.lat, d.lng, d.usuario_nome, d.usuario_email,
-    ].map(esc).join(';'),
-  )
-  const csv = '﻿' + [cab.map(esc).join(';'), ...corpo].join('\r\n')
-  const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8' }))
-  const a = document.createElement('a')
-  a.href = url
-  a.download = `denuncias-${chaveDia(new Date())}.csv`
-  a.click()
-  URL.revokeObjectURL(url)
-}
-
 const DashboardDenuncias = () => {
   const { denuncias, carregando, erro, arquivar, alterarStatus } = useDenuncias()
 
   const [periodo, setPeriodo] = useState<number>(7)
-  const [busca, setBusca] = useState('')
-  const [filtroStatus, setFiltroStatus] = useState<'todos' | StatusDenuncia>('todos')
-  const [filtroTipo, setFiltroTipo] = useState<'todos' | TipoOcorrencia>('todos')
-  const [pagina, setPagina] = useState(1)
+  const { busca, setBusca, filtroStatus, setFiltroStatus, filtroTipo, setFiltroTipo, filtradas } =
+    useFiltroDenunciasAdmin(denuncias)
+  const { setPagina, paginaAtual, totalPaginas, inicio, visiveis } = usePaginacao(filtradas, POR_PAGINA)
 
   const [vendo, setVendo] = useState<DenunciaLista | null>(null)
   const [alvo, setAlvo] = useState<DenunciaLista | null>(null)
@@ -74,61 +50,17 @@ const DashboardDenuncias = () => {
   const [erroStatus, setErroStatus] = useState<string | null>(null)
 
   const totais = useMemo(() => {
-    const conta = (s: StatusDenuncia) => denuncias.filter((d) => d.status === s).length
+    const porStatus = contarPorStatus(denuncias)
     return {
       total: denuncias.length,
-      recebidas: conta('recebida'),
-      emAnalise: conta('em_analise'),
-      concluidas: conta('concluida'),
+      recebidas: porStatus.recebida,
+      emAnalise: porStatus.em_analise,
+      concluidas: porStatus.concluida,
     }
   }, [denuncias])
 
   // Gráficos: filtrados pelo período (data em que o relato foi recebido)
-  const { dias, porTipo } = useMemo(() => {
-    const hoje = new Date()
-    hoje.setHours(0, 0, 0, 0)
-
-    const lista = Array.from({ length: periodo }, (_, i) => {
-      const dt = new Date(hoje)
-      dt.setDate(hoje.getDate() - (periodo - 1 - i))
-      return { chave: chaveDia(dt), rotulo: DIA_CURTO.format(dt).replace('.', ''), total: 0 }
-    })
-    const indice = new Map(lista.map((d) => [d.chave, d]))
-    const tipos = new Map<TipoOcorrencia, number>()
-
-    for (const d of denuncias) {
-      const dia = indice.get(chaveDia(new Date(d.created_at)))
-      if (!dia) continue
-      dia.total += 1
-      tipos.set(d.tipo, (tipos.get(d.tipo) ?? 0) + 1)
-    }
-
-    return {
-      dias: lista,
-      porTipo: [...tipos.entries()]
-        .map(([tipo, total]) => ({ tipo, total }))
-        .sort((a, b) => b.total - a.total),
-    }
-  }, [denuncias, periodo])
-
-  const filtradas = useMemo(() => {
-    const q = busca.trim().toLowerCase()
-    return denuncias.filter(
-      (d) =>
-        (filtroStatus === 'todos' || d.status === filtroStatus) &&
-        (filtroTipo === 'todos' || d.tipo === filtroTipo) &&
-        (!q ||
-          d.protocolo.toLowerCase().includes(q) ||
-          d.titulo.toLowerCase().includes(q) ||
-          d.municipio.toLowerCase().includes(q) ||
-          (d.usuario_nome ?? '').toLowerCase().includes(q)),
-    )
-  }, [denuncias, busca, filtroStatus, filtroTipo])
-
-  const totalPaginas = Math.max(1, Math.ceil(filtradas.length / POR_PAGINA))
-  const paginaAtual = Math.min(pagina, totalPaginas)
-  const inicio = (paginaAtual - 1) * POR_PAGINA
-  const visiveis = filtradas.slice(inicio, inicio + POR_PAGINA)
+  const { dias, porTipo } = useMemo(() => agruparPorDia(denuncias, periodo), [denuncias, periodo])
 
   async function confirmarArquivar() {
     if (!alvo) return

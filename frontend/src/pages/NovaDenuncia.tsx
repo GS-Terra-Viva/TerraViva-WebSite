@@ -1,53 +1,19 @@
-import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import * as L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import { MapPin, ShieldCheck, ArrowRight } from 'lucide-react'
 
 import Navbar from '../components/ui/NavBar'
-import { getSession } from '../services/authService'
-import {
-  TIPOS_OCORRENCIA,
-  centroDoMunicipio,
-  criarDenuncia,
-  listarMunicipiosSP,
-  type Municipio,
-  type TipoOcorrencia,
-} from '../services/denuncias'
 import Footer from '../components/ui/Footer'
-
-type LatLng = { lat: number; lng: number }
-type Erros = Partial<
-  Record<'tipo' | 'data' | 'titulo' | 'descricao' | 'municipio' | 'declaro', string>
->
+import { TIPOS_OCORRENCIA, type TipoOcorrencia } from '../services/denuncias'
+import { chaveDia } from '../utils/formatters'
+import { useNovaDenuncia } from '../hooks/useNovaDenuncia'
+import type { LatLng } from '../hooks/useMapaSelecao'
 
 const MAX_DESCRICAO = 3000
 const MAX_TITULO = 120
 
-// Estado de São Paulo (centro e limites para o mapa)
-const CENTRO_SP: [number, number] = [-22.3, -48.7]
-const LIMITES_SP = L.latLngBounds([-26.0, -54.5], [-19.0, -43.0])
-
 // Data local (yyyy-mm-dd) — toISOString usaria UTC e erraria o "hoje" à noite no Brasil
-const hoje = () => {
-  const d = new Date()
-  const mm = String(d.getMonth() + 1).padStart(2, '0')
-  const dd = String(d.getDate()).padStart(2, '0')
-  return `${d.getFullYear()}-${mm}-${dd}`
-}
+const hoje = () => chaveDia(new Date())
 const fmtLatLng = (p: LatLng) => `${p.lat.toFixed(5)}, ${p.lng.toFixed(5)}`
-
-// O erro do Supabase é um objeto simples (não é instância de Error)
-const msgErro = (e: unknown) => {
-  const m =
-    typeof e === 'object' && e !== null && 'message' in e
-      ? String((e as { message: unknown }).message)
-      : String(e)
-  if (m.includes('sessao_invalida')) {
-    return 'Sua sessão expirou. Entre novamente para enviar a denúncia.'
-  }
-  return m
-}
 
 const inputCls =
   'w-full p-2.5 text-sm rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-700'
@@ -56,154 +22,23 @@ const erroCls = 'mt-1 text-xs text-red-600'
 
 const NovaDenuncia = () => {
   const navigate = useNavigate()
-  const usuario = getSession() // só para exibir "em nome de"; quem grava é o banco, pelo token
 
-  const mapDivRef = useRef<HTMLDivElement>(null)
-  const mapRef = useRef<L.Map | null>(null)
-  const pinRef = useRef<L.Marker | null>(null)
-
-  // Campos do formulário
-  const [tipo, setTipo] = useState<TipoOcorrencia | ''>('')
-  const [data, setData] = useState('')
-  const [titulo, setTitulo] = useState('')
-  const [comunidade, setComunidade] = useState('')
-  const [descricao, setDescricao] = useState('')
-  const [municipioId, setMunicipioId] = useState('')
-  const [ponto, setPonto] = useState<LatLng | null>(null)
-  const [declaro, setDeclaro] = useState(false)
-
-  // Estado da tela
-  const [municipios, setMunicipios] = useState<Municipio[]>([])
-  const [erroMunicipios, setErroMunicipios] = useState<string | null>(null)
-  const [erros, setErros] = useState<Erros>({})
-  const [enviando, setEnviando] = useState(false)
-  const [erroEnvio, setErroEnvio] = useState<string | null>(null)
-  const [protocolo, setProtocolo] = useState<string | null>(null)
-
-  // --- Municípios de SP (IBGE) ---
-  useEffect(() => {
-    listarMunicipiosSP()
-      .then(setMunicipios)
-      .catch((e) => {
-        console.error(e)
-        setErroMunicipios('Não foi possível carregar a lista de municípios. Recarregue a página.')
-      })
-  }, [])
-
-  // --- Mapa (Leaflet + OpenStreetMap) ---
-  // O mapa só existe enquanto o formulário está na tela (some na tela de sucesso),
-  // por isso o efeito depende de `protocolo`: recria ao voltar para o formulário.
-  useEffect(() => {
-    if (protocolo || !mapDivRef.current) return
-
-    const map = L.map(mapDivRef.current, {
-      maxBounds: LIMITES_SP,
-      maxBoundsViscosity: 1,
-      minZoom: 6,
-    }).setView(CENTRO_SP, 6)
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '&copy; contribuidores do OpenStreetMap',
-    }).addTo(map)
-
-    // Clicar marca (ou move) o local da ocorrência
-    map.on('click', (e: L.LeafletMouseEvent) => {
-      const p = { lat: e.latlng.lat, lng: e.latlng.lng }
-      if (!pinRef.current) {
-        const pin = L.marker([p.lat, p.lng], { draggable: true }).addTo(map)
-        pin.on('dragend', () => {
-          const ll = pin.getLatLng()
-          setPonto({ lat: ll.lat, lng: ll.lng })
-        })
-        pinRef.current = pin
-      } else {
-        pinRef.current.setLatLng([p.lat, p.lng])
-      }
-      setPonto(p)
-    })
-
-    mapRef.current = map
-    return () => {
-      map.remove()
-      mapRef.current = null
-      pinRef.current = null
-    }
-  }, [protocolo])
-
-  // Ao escolher o município, o mapa voa até ele
-  async function escolherMunicipio(id: string) {
-    setMunicipioId(id)
-    setErros((x) => ({ ...x, municipio: undefined }))
-    const m = municipios.find((mu) => String(mu.id) === id)
-    if (!m) return
-    const centro = await centroDoMunicipio(m.nome)
-    if (centro && mapRef.current) mapRef.current.flyTo([centro.lat, centro.lng], 12)
-  }
-
-  function limparMarcador() {
-    pinRef.current?.remove()
-    pinRef.current = null
-    setPonto(null)
-  }
-
-  function validar(): Erros {
-    const e: Erros = {}
-    if (!tipo) e.tipo = 'Selecione o tipo de ocorrência.'
-    if (!data) e.data = 'Informe a data do ocorrido.'
-    else if (data > hoje()) e.data = 'A data não pode ser no futuro.'
-    if (!titulo.trim()) e.titulo = 'Resuma o ocorrido em uma frase.'
-    if (!descricao.trim()) e.descricao = 'Descreva o que aconteceu.'
-    if (!municipioId) e.municipio = 'Selecione o município.'
-    if (!declaro) e.declaro = 'É necessário declarar que as informações são verdadeiras.'
-    return e
-  }
-
-  async function enviar(ev: React.FormEvent<HTMLFormElement>) {
-    ev.preventDefault()
-    setErroEnvio(null)
-
-    const e = validar()
-    setErros(e)
-    if (Object.keys(e).length > 0) return
-
-    const municipio = municipios.find((m) => String(m.id) === municipioId)
-    if (!municipio || !tipo) return
-
-    setEnviando(true)
-    try {
-      // Grava no Supabase (função criar_denuncia) — só segue se o banco confirmar
-      const criada = await criarDenuncia({
-        tipo,
-        dataOcorrido: data,
-        titulo,
-        comunidade,
-        descricao,
-        municipio,
-        ponto,
-      })
-      setProtocolo(criada.protocolo)
-    } catch (err) {
-      console.error(err)
-      setErroEnvio(msgErro(err))
-    } finally {
-      setEnviando(false)
-    }
-  }
-
-  function novaDenuncia() {
-    setTipo('')
-    setData('')
-    setTitulo('')
-    setComunidade('')
-    setDescricao('')
-    setMunicipioId('')
-    setPonto(null)
-    setDeclaro(false)
-    setErros({})
-    setErroEnvio(null)
-    setProtocolo(null) // o efeito do mapa recria o mapa limpo
-  }
+  // Formulário, validação, envio, mapa e municípios ficam no hook; a página só apresenta
+  const {
+    usuario,
+    tipo, setTipo,
+    data, setData,
+    titulo, setTitulo,
+    comunidade, setComunidade,
+    descricao, setDescricao,
+    municipioId, escolherMunicipio,
+    declaro, setDeclaro,
+    municipios, erroMunicipios,
+    mapDivRef, ponto, limparMarcador,
+    erros, setErros,
+    enviando, erroEnvio, protocolo,
+    enviar, novaDenuncia,
+  } = useNovaDenuncia()
 
   return (
     <div className="min-h-screen bg-[#f6f7f0] text-gray-900">
@@ -212,12 +47,12 @@ const NovaDenuncia = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 my-20 md:p-8">
-      <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
-                  <Link to="/" className="hover:underline">
-                    Início
-                  </Link>{' '}
-                  / <span>Nova Denúncia</span>
-                </nav>
+        <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+          <Link to="/" className="hover:underline">
+            Início
+          </Link>{' '}
+          / <span>Nova Denúncia</span>
+        </nav>
         <h1 className="mt-2 text-4xl font-bold">O seu relato importa.</h1>
         <p className="mt-2 text-sm text-gray-600">
           Conte o que aconteceu. Quanto mais contexto, melhor será a análise.
@@ -499,7 +334,7 @@ const NovaDenuncia = () => {
           </form>
         )}
       </div>
-      <Footer/>
+      <Footer />
     </div>
   )
 }

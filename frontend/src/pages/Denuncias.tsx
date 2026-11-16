@@ -1,43 +1,15 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
-
-import Navbar from '../components/ui/NavBar'
-import { supabase } from '../services/supabase'
-import Footer from "../components/ui/Footer";
 import { Link } from 'react-router-dom'
 
-type DenunciaPublica = {
-  id: string
-  protocolo: string
-  tipo: string
-  data_ocorrido: string
-  titulo: string
-  comunidade: string | null
-  municipio: string
-  lat: number | null
-  lng: number | null
-  status: string
-  created_at: string
-}
-
-const TIPOS: Record<string, string> = {
-  invasao_territorio: 'Invasão de território',
-  desmatamento: 'Desmatamento',
-  exploracao_ilegal: 'Exploração ilegal',
-  violencia: 'Violência ou ameaça',
-  conflito_fundiario: 'Conflito fundiário',
-  contaminacao: 'Contaminação / poluição',
-  acesso_servicos: 'Falta de acesso a serviços',
-  outro: 'Outro',
-}
-
-const STATUS: Record<string, string> = {
-  recebida: 'Recebida',
-  em_analise: 'Em análise',
-  encaminhada: 'Encaminhada',
-  concluida: 'Concluída',
-}
+import Navbar from '../components/ui/NavBar'
+import Footer from '../components/ui/Footer'
+import { STATUS_DENUNCIA, TIPOS_OCORRENCIA } from '../services/denuncias'
+import type { DenunciaMapa } from '../services/denunciasPublicas'
+import { useDenunciasPublicas } from '../hooks/useDenunciasPublicas'
+import { useFiltroDenunciasPublicas } from '../hooks/useFiltroDenunciasPublicas'
+import { useMapaDenuncias } from '../hooks/useMapaDenuncias'
+// Os valores vêm do banco como string, então indexamos por string
+const TIPOS: Record<string, string> = TIPOS_OCORRENCIA
+const STATUS: Record<string, string> = STATUS_DENUNCIA
 
 const CORES: Record<string, string> = {
   recebida: '#687C51',
@@ -53,186 +25,28 @@ function formatarData(data: string) {
 }
 
 function Denuncias() {
-  const [denuncias, setDenuncias] = useState<DenunciaPublica[]>([])
-  const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState('')
+  // Dados, filtros e mapa ficam nos hooks; a página só apresenta
+  const { denuncias, carregando, erro } = useDenunciasPublicas()
 
-  const [busca, setBusca] = useState('')
-  const [municipio, setMunicipio] = useState('')
-  const [comunidade, setComunidade] = useState('')
-  const [tipo, setTipo] = useState('')
-  const [status, setStatus] = useState('')
+  const {
+    busca, setBusca,
+    municipio, setMunicipio,
+    comunidade, setComunidade,
+    tipo, setTipo,
+    status, setStatus,
+    municipios, comunidades, filtradas, comLocalizacao, limparFiltros,
+  } = useFiltroDenunciasPublicas(denuncias)
 
-  const mapaRef = useRef<HTMLDivElement>(null)
-  const instanciaMapa = useRef<L.Map | null>(null)
-  const camadaMarcadores = useRef<L.LayerGroup | null>(null)
-  const marcadores = useRef<Map<string, L.CircleMarker>>(new Map())
+  const { mapaRef, localizar } = useMapaDenuncias(comLocalizacao, CORES, STATUS)
 
-  useEffect(() => {
-    async function carregarDenuncias() {
-      setCarregando(true)
-      setErro('')
-
-      const { data, error } = await supabase.rpc('listar_denuncias_publicas')
-
-      if (error) {
-        console.error('Erro ao carregar denúncias:', error)
-        setErro('Não foi possível carregar as denúncias.')
-        setCarregando(false)
-        return
-      }
-
-      setDenuncias((data ?? []) as DenunciaPublica[])
-      setCarregando(false)
-    }
-
-    carregarDenuncias()
-  }, [])
-
-  const municipios = useMemo(
-    () => [...new Set(denuncias.map((d) => d.municipio).filter(Boolean))].sort(),
-    [denuncias],
-  )
-
-  const comunidades = useMemo(
-    () =>
-      [
-        ...new Set(
-          denuncias
-            .filter((d) => !municipio || d.municipio === municipio)
-            .map((d) => d.comunidade)
-            .filter((c): c is string => Boolean(c)),
-        ),
-      ].sort(),
-    [denuncias, municipio],
-  )
-
-  const filtradas = useMemo(() => {
-    const termo = busca.trim().toLowerCase()
-
-    return denuncias.filter((d) => {
-      const correspondeBusca =
-        !termo ||
-        d.titulo.toLowerCase().includes(termo) ||
-        d.protocolo.toLowerCase().includes(termo)
-
-      return (
-        correspondeBusca &&
-        (!municipio || d.municipio === municipio) &&
-        (!comunidade || d.comunidade === comunidade) &&
-        (!tipo || d.tipo === tipo) &&
-        (!status || d.status === status)
-      )
-    })
-  }, [denuncias, busca, municipio, comunidade, tipo, status])
-
-  const comLocalizacao = useMemo(
-    () => filtradas.filter((d) => d.lat !== null && d.lng !== null),
-    [filtradas],
-  )
-
-  // Inicializa o mapa uma única vez.
-  useEffect(() => {
-    if (!mapaRef.current || instanciaMapa.current) return
-
-    const mapa = L.map(mapaRef.current).setView([-14.235, -51.925], 4)
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 19,
-    }).addTo(mapa)
-
-    instanciaMapa.current = mapa
-    camadaMarcadores.current = L.layerGroup().addTo(mapa)
-
-    const timer = window.setTimeout(() => mapa.invalidateSize(), 200)
-
-    return () => {
-      window.clearTimeout(timer)
-      mapa.remove()
-      instanciaMapa.current = null
-      camadaMarcadores.current = null
-      marcadores.current.clear()
-    }
-  }, [])
-
-  // Atualiza os marcadores sempre que os filtros mudarem.
-  useEffect(() => {
-    const mapa = instanciaMapa.current
-    const camada = camadaMarcadores.current
-
-    if (!mapa || !camada) return
-
-    camada.clearLayers()
-    marcadores.current.clear()
-
-    const pontos: L.LatLngExpression[] = []
-
-    comLocalizacao.forEach((d) => {
-      const cor = CORES[d.status] ?? '#64748b'
-
-      const marcador = L.circleMarker([d.lat!, d.lng!], {
-        radius: 8,
-        color: '#ffffff',
-        weight: 2,
-        fillColor: cor,
-        fillOpacity: 0.95,
-      })
-
-      const popup = document.createElement('div')
-      const titulo = document.createElement('strong')
-      titulo.textContent = d.titulo
-
-      const protocolo = document.createElement('p')
-      protocolo.textContent = `Protocolo: ${d.protocolo}`
-
-      const local = document.createElement('p')
-      local.textContent = `${d.comunidade ? `${d.comunidade}, ` : ''}${d.municipio}`
-
-      const situacao = document.createElement('p')
-      situacao.textContent = `Status: ${STATUS[d.status] ?? d.status}`
-
-      popup.append(titulo, protocolo, local, situacao)
-      marcador.bindPopup(popup)
-      marcador.addTo(camada)
-
-      marcadores.current.set(d.id, marcador)
-      pontos.push([d.lat!, d.lng!])
-    })
-
-    if (pontos.length > 1) {
-      mapa.fitBounds(L.latLngBounds(pontos), { padding: [30, 30], maxZoom: 13 })
-    } else if (pontos.length === 1) {
-      mapa.setView(pontos[0], 13)
-    }
-  }, [comLocalizacao])
-
-  function localizarDenuncia(denuncia: DenunciaPublica) {
-    const marcador = marcadores.current.get(denuncia.id)
-    const mapa = instanciaMapa.current
-
-    if (!marcador || !mapa || denuncia.lat === null || denuncia.lng === null) {
-      return
-    }
-
-    mapa.setView([denuncia.lat, denuncia.lng], 15)
-    marcador.openPopup()
-  }
-
-  function limparFiltros() {
-    setBusca('')
-    setMunicipio('')
-    setComunidade('')
-    setTipo('')
-    setStatus('')
-  }
+  const localizarDenuncia = (d: DenunciaMapa) => localizar(d)
 
   return (
     <>
       <Navbar />
 
       <main className="min-h-screen bg-[#f6f7f0] px-6 pt-32 pb-12 text-black md:px-12">
-        
+
         <div className="mx-auto max-w-7x1">
         <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
                   <Link to="/" className="hover:underline">

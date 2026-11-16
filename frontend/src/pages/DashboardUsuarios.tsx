@@ -1,31 +1,17 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useState } from 'react'
 import { ArrowLeft, ArrowRight, Search } from 'lucide-react'
 
 import AdminLayout from '../components/layout/AdminLayout'
 import StatCard from '../components/ui/StatCard'
 import UsuariosTabela from '../components/ui/UsuariosTabela'
 import ConfirmarExclusaoModal from '../components/ui/ConfirmarExclusaoModal'
-import {
-  excluirUsuario,
-  getSession,
-  listarUsuarios,
-  type UsuarioLista,
-} from '../services/authService'
+import { getSession, type UsuarioLista } from '../services/authService'
+import { useUsuarios } from '../hooks/useUsuarios'
+import { useFiltroUsuarios } from '../hooks/useFiltroUsuarios'
+import { usePaginacao } from '../hooks/usePaginacao'
+import { msgErro } from '../utils/erros'
 
 const POR_PAGINA = 5
-
-const msgErro = (e: unknown) => {
-  const m =
-    typeof e === 'object' && e !== null && 'message' in e
-      ? String((e as { message: unknown }).message)
-      : String(e)
-  if (m.includes('sessao_invalida')) return 'Sua sessão expirou. Entre novamente.'
-  if (m.includes('nao_pode_excluir_a_si_mesmo')) return 'Você não pode excluir a si mesmo.'
-  if (m.includes('violates foreign key')) {
-    return 'Este usuário possui registros vinculados (ex.: denúncias) e não pode ser excluído.'
-  }
-  return m
-}
 
 const selectCls =
   'p-2.5 text-sm rounded border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-green-700'
@@ -33,58 +19,20 @@ const selectCls =
 const DashboardUsuarios = () => {
   const logado = getSession()
 
-  const [usuarios, setUsuarios] = useState<UsuarioLista[]>([])
-  const [carregando, setCarregando] = useState(true)
-  const [erro, setErro] = useState<string | null>(null)
-
-  const [busca, setBusca] = useState('')
-  const [filtroRole, setFiltroRole] = useState<'todos' | 'admin' | 'user'>('todos')
-  const [pagina, setPagina] = useState(1)
+  const { usuarios, carregando, erro, excluir } = useUsuarios()
+  const { busca, setBusca, filtroRole, setFiltroRole, totais, filtrados } = useFiltroUsuarios(usuarios)
+  const { setPagina, paginaAtual, totalPaginas, inicio, visiveis } = usePaginacao(filtrados, POR_PAGINA)
 
   const [alvo, setAlvo] = useState<UsuarioLista | null>(null)
   const [excluindo, setExcluindo] = useState(false)
   const [erroExclusao, setErroExclusao] = useState<string | null>(null)
-
-  useEffect(() => {
-    listarUsuarios()
-      .then(setUsuarios)
-      .catch((e) => {
-        console.error(e)
-        setErro(msgErro(e))
-      })
-      .finally(() => setCarregando(false))
-  }, [])
-
-  const totais = useMemo(
-    () => ({
-      total: usuarios.length,
-      admins: usuarios.filter((u) => u.role === 'admin').length,
-      comuns: usuarios.filter((u) => u.role === 'user').length,
-    }),
-    [usuarios],
-  )
-
-  const filtrados = useMemo(() => {
-    const q = busca.trim().toLowerCase()
-    return usuarios.filter(
-      (u) =>
-        (filtroRole === 'todos' || u.role === filtroRole) &&
-        (!q || u.name.toLowerCase().includes(q) || u.email.toLowerCase().includes(q)),
-    )
-  }, [usuarios, busca, filtroRole])
-
-  const totalPaginas = Math.max(1, Math.ceil(filtrados.length / POR_PAGINA))
-  const paginaAtual = Math.min(pagina, totalPaginas)
-  const inicio = (paginaAtual - 1) * POR_PAGINA
-  const visiveis = filtrados.slice(inicio, inicio + POR_PAGINA)
 
   async function confirmarExclusao() {
     if (!alvo) return
     setExcluindo(true)
     setErroExclusao(null)
     try {
-      await excluirUsuario(alvo.id)
-      setUsuarios((lista) => lista.filter((u) => u.id !== alvo.id))
+      await excluir(alvo.id)
       setAlvo(null)
     } catch (e) {
       console.error(e)

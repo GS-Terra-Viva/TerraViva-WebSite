@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { ArrowLeft, Check } from 'lucide-react'
 
@@ -6,19 +5,13 @@ import Navbar from '../components/ui/NavBar'
 import { TIPOS_OCORRENCIA, type TipoOcorrencia } from '../services/denuncias'
 import {
   ETAPAS,
-  buscarDenunciaPorProtocolo,
   fmtDataIso,
   fmtRecebida,
   identificarEtapa,
   type DenunciaPublica,
   type EtapaId,
 } from '../services/denunciasPublicas'
-
-type Estado =
-  | { tipo: 'carregando' }
-  | { tipo: 'erro' }
-  | { tipo: 'naoEncontrada' }
-  | { tipo: 'ok'; denuncia: DenunciaPublica }
+import { useDenunciaPorProtocolo } from '../hooks/useDenunciaPorProtocolo'
 
 const COR_ETAPA: Record<EtapaId, string> = {
   recebida: 'bg-red-100 text-red-700',
@@ -42,32 +35,8 @@ function Campo({ rotulo, valor }: { rotulo: string; valor: string }) {
 const AcompanharDenuncia = () => {
   const { protocolo = '' } = useParams()
 
-  // Guarda de qual protocolo é o resultado, para não mostrar dados antigos ao trocar de protocolo
-  const [resultado, setResultado] = useState<{ para: string; estado: Estado } | null>(null)
-
-  useEffect(() => {
-    let ativo = true
-
-    buscarDenunciaPorProtocolo(protocolo)
-      .then((d) => {
-        if (!ativo) return
-        setResultado({
-          para: protocolo,
-          estado: d ? { tipo: 'ok', denuncia: d } : { tipo: 'naoEncontrada' },
-        })
-      })
-      .catch((e) => {
-        console.error(e)
-        if (ativo) setResultado({ para: protocolo, estado: { tipo: 'erro' } })
-      })
-
-    return () => {
-      ativo = false
-    }
-  }, [protocolo])
-
-  const estado: Estado =
-    resultado && resultado.para === protocolo ? resultado.estado : { tipo: 'carregando' }
+  // A consulta (loading, erro, não encontrada, ok) fica no hook
+  const estado = useDenunciaPorProtocolo(protocolo)
 
   return (
     <div className="min-h-screen bg-[#f6f7f0] text-gray-900">
@@ -76,15 +45,16 @@ const AcompanharDenuncia = () => {
       </div>
 
       <div className="max-w-6xl mx-auto px-4 my-20 md:p-8">
-      <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
-                  <Link to="/" className="hover:underline">
-                    Início
-                  </Link>{' '}/{' '}
-                  <Link to="/minhas-denuncias" className="hover:underline">
-                    Minhas Denúncias
-                  </Link>{' '}
-                  / <span>{protocolo}</span>
-                </nav>
+        <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+          <Link to="/" className="hover:underline">
+            Início
+          </Link>{' '}
+          /{' '}
+          <Link to="/minhas-denuncias" className="hover:underline">
+            Minhas Denúncias
+          </Link>{' '}
+          / <span>{protocolo}</span>
+        </nav>
         <h1 className="mt-2 text-4xl font-bold">Andamento da denúncia.</h1>
 
         <Link
@@ -132,8 +102,6 @@ function Detalhe({ denuncia: d }: { denuncia: DenunciaPublica }) {
     { id: 'encaminhada', titulo: 'Encaminhamento', texto: d.mensagemEncaminhamento },
     { id: 'concluida', titulo: 'Conclusão', texto: d.mensagemConclusao },
   ].filter((m): m is { id: string; titulo: string; texto: string } => !!m.texto?.trim())
-
-    console.log(d)
 
   return (
     <div className="mt-6 grid grid-cols-1 lg:grid-cols-[1.4fr_1fr] gap-6 items-start">
