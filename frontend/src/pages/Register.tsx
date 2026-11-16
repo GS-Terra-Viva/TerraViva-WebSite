@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ArrowRight, Eye, EyeOff, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../hooks/useAuth';
 import IMAGEM_LATERAL from '../assets/pages/login/loginimage.png';
+import LOGO from '../assets/pages/home/Logotipo Terra Viva.png';
 
 const MIN_SENHA = 6;
 const inputCls =
@@ -71,8 +72,8 @@ function Register() {
             backgroundPosition: 'center, bottom',
           }}
         >
-          <div className="absolute top-10 left-12 text-2xl font-extrabold tracking-wide">
-            TERRA VIVA
+          <div className="absolute top-5 left-0 text-2xl font-extrabold tracking-wide">
+            <img src={LOGO} className='w-60' />
           </div>
         </div>
 

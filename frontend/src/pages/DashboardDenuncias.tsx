@@ -199,7 +199,7 @@ const DashboardDenuncias = () => {
   }
 
   return (
-    <AdminLayout titulo="Denúncias">
+    <AdminLayout titulo="Denúncias" valor={carregando ? undefined : totais.total}>
       <main className="max-w-6xl p-6 md:p-10">
         <p className="text-xs font-bold tracking-wide text-green-800">PAINEL / DENÚNCIAS</p>
         <h1 className="mt-2 text-4xl font-bold">O que a comunidade está relatando.</h1>

@@ -95,7 +95,7 @@ const DashboardUsuarios = () => {
   }
 
   return (
-    <AdminLayout titulo="Gestão de usuários">
+    <AdminLayout titulo="Gestão de usuários" valor={carregando ? undefined : totais.total}>
         <main className="max-w-6xl p-6 md:p-10">
           <p className="text-xs font-bold tracking-wide text-green-800">PAINEL / USUÁRIOS</p>
           <h1 className="mt-2 text-4xl font-bold">Quem faz parte da plataforma.</h1>
