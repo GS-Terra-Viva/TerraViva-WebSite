@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -17,21 +18,15 @@ const Footer = () => {
           </div>
 
           <nav className="flex flex-wrap items-start gap-5 text-sm" aria-label="Navegação do rodapé">
-            <a href="/sobre" style={{ color: "#FAF0D4" }}>
+            <Link to="/sobre" style={{ color: "#FAF0D4" }}>
               O projeto
-            </a>
+            </Link>
 
-            <a href="/#como-funciona" style={{ color: "#FAF0D4" }}>
+            <Link to="/como-funciona" style={{ color: "#FAF0D4" }}>
               Como funciona
-            </a>
+            </Link>
 
-            <a href="/privacidade" style={{ color: "#FAF0D4" }}>
-              Privacidade
-            </a>
 
-            <a href="/contato" style={{ color: "#FAF0D4" }}>
-              Contato
-            </a>
           </nav>
 
         </div>
