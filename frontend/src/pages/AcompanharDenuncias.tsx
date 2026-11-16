@@ -70,13 +70,21 @@ const AcompanharDenuncia = () => {
     resultado && resultado.para === protocolo ? resultado.estado : { tipo: 'carregando' }
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
-      <div className="relative z-20 px-4 py-2 border-b border-gray-200 bg-white">
+    <div className="min-h-screen bg-[#f6f7f0] text-gray-900">
+      <div className="relative z-20 border-b border-gray-200 bg-white">
         <Navbar />
       </div>
 
-      <div className="max-w-6xl mx-auto p-4 md:p-8">
-        <p className="text-xs font-bold tracking-wide text-green-800">DENÚNCIAS / ACOMPANHAMENTO</p>
+      <div className="max-w-6xl mx-auto px-4 my-20 md:p-8">
+      <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+                  <Link to="/" className="hover:underline">
+                    Início
+                  </Link>{' '}/{' '}
+                  <Link to="/minhas-denuncias" className="hover:underline">
+                    Minhas Denúncias
+                  </Link>{' '}
+                  / <span>{protocolo}</span>
+                </nav>
         <h1 className="mt-2 text-4xl font-bold">Andamento da denúncia.</h1>
 
         <Link

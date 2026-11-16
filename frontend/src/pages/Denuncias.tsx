@@ -5,6 +5,7 @@ import 'leaflet/dist/leaflet.css'
 import Navbar from '../components/ui/NavBar'
 import { supabase } from '../services/supabase'
 import Footer from "../components/ui/Footer";
+import { Link } from 'react-router-dom'
 
 type DenunciaPublica = {
   id: string
@@ -230,45 +231,52 @@ function Denuncias() {
     <>
       <Navbar />
 
-      <main className="min-h-screen bg-[#12241B] px-6 pt-32 pb-12 text-[#FAF0D4] md:px-12">
+      <main className="min-h-screen bg-[#f6f7f0] px-6 pt-32 pb-12 text-black md:px-12">
+        
         <div className="mx-auto max-w-7x1">
+        <nav aria-label="Você está em" className="text-sm text-[#2c674b] mb-5">
+                  <Link to="/" className="hover:underline">
+                    Início
+                  </Link>{' '}
+                  / <span>Denúncias</span>
+                </nav>
 
         <header className="mb-10">
           <h1 className="text-3xl font-bold">Denúncias públicas</h1>
-          <p className="mt-2 text-[#FAF0D4]">
+          <p className="mt-2 text-[#657168]">
             Consulte as denúncias registradas e acompanhe sua situação.
           </p>
         </header>
 
         <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
-            <p className="text-sm font-bold text-[#D1C6A8]">Denúncias encontradas</p>
-            <strong className="mt-2 block text-3xl text-[#FAF0D4]">{filtradas.length}</strong>
+          <div className="rounded-xl bg-white p-5">
+            <p className="text-sm font-bold text-black">Denúncias encontradas</p>
+            <strong className="mt-2 block text-3xl text-black">{filtradas.length}</strong>
           </div>
 
-          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
-            <p className="text-sm font-bold text-[#D1C6A8]">Recebidas</p>
-            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
+          <div className="rounded-xl bg-white p-5">
+            <p className="text-sm font-bold text-black">Recebidas</p>
+            <strong className="mt-2 block text-3xl text-black">
               {filtradas.filter((d) => d.status === 'recebida').length}
             </strong>
           </div>
 
-          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
-            <p className="text-sm font-bold text-[#D1C6A8]">Em análise</p>
-            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
+          <div className="rounded-xl bg-white p-5">
+            <p className="text-sm font-bold text-black">Em análise</p>
+            <strong className="mt-2 block text-3xl text-black">
               {filtradas.filter((d) => d.status === 'em_analise').length}
             </strong>
           </div>
 
-          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
-            <p className="text-sm font-bold text-[#D1C6A8]">Concluídas</p>
-            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
+          <div className="rounded-xl bg-white p-5">
+            <p className="text-sm font-bold text-black">Concluídas</p>
+            <strong className="mt-2 block text-3xl text-black">
               {filtradas.filter((d) => d.status === 'concluida').length}
             </strong>
           </div>
         </section>
 
-        <section className="mb-8 rounded-xl border border-[#D1C6A8] bg-[#FAF0D4] p-6 text-[#12241B]">
+        <section className="mb-8 rounded-xl bg-white p-6 text-[#12241B]">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-lg font-bold text-[#12241B]">Filtros</h2>
             <button
@@ -285,7 +293,7 @@ function Denuncias() {
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar título"
-              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
+              className="w-full rounded-lg border border-[#657168] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             />
 
             <select
@@ -294,7 +302,7 @@ function Denuncias() {
                 setMunicipio(e.target.value)
                 setComunidade('')
               }}
-              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
+              className="w-full rounded-lg border border-[#657168] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os municípios</option>
               {municipios.map((m) => (
@@ -305,7 +313,7 @@ function Denuncias() {
             <select
               value={comunidade}
               onChange={(e) => setComunidade(e.target.value)}
-              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
+              className="w-full rounded-lg border border-[#657168] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todas as comunidades</option>
               {comunidades.map((c) => (
@@ -316,7 +324,7 @@ function Denuncias() {
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
+              className="w-full rounded-lg border border-[#657168] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os tipos</option>
               {Object.entries(TIPOS).map(([valor, nome]) => (
@@ -327,7 +335,7 @@ function Denuncias() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
+              className="w-full rounded-lg border border-[#657168] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os status</option>
               {Object.entries(STATUS).map(([valor, nome]) => (
@@ -342,7 +350,7 @@ function Denuncias() {
             <h2 className="mb-3 text-lg font-semibold">Mapa das denúncias</h2>
             <div
               ref={mapaRef}
-              className="h-[500px] w-full rounded-xl border border-[#3A5143] overflow-hidden"
+              className="h-[500px] w-full rounded-xl border border-transparent overflow-hidden"
             />
             <p className="mt-2 text-[#FAF0D4]">
               {comLocalizacao.length} denúncia(s) com localização no mapa.
