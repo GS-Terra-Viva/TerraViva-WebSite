@@ -4,6 +4,7 @@ import 'leaflet/dist/leaflet.css'
 
 import Navbar from '../components/ui/NavBar'
 import { supabase } from '../services/supabase'
+import Footer from "../components/ui/Footer";
 
 type DenunciaPublica = {
   id: string
@@ -38,10 +39,10 @@ const STATUS: Record<string, string> = {
 }
 
 const CORES: Record<string, string> = {
-  recebida: '#2563eb',
-  em_analise: '#d97706',
-  encaminhada: '#7c3aed',
-  concluida: '#16a34a',
+  recebida: '#687C51',
+  em_analise: '#A71E0C',
+  encaminhada: '#C49A32',
+  concluida: '#287044',
 }
 
 function formatarData(data: string) {
@@ -229,49 +230,51 @@ function Denuncias() {
     <>
       <Navbar />
 
-      <main className="mx-auto max-w-7xl px-4 py-8">
-        <header className="mb-6">
+      <main className="min-h-screen bg-[#12241B] px-6 pt-32 pb-12 text-[#FAF0D4] md:px-12">
+        <div className="mx-auto max-w-7x1">
+
+        <header className="mb-10">
           <h1 className="text-3xl font-bold">Denúncias públicas</h1>
-          <p className="mt-2 text-gray-600">
+          <p className="mt-2 text-[#FAF0D4]">
             Consulte as denúncias registradas e acompanhe sua situação.
           </p>
         </header>
 
-        <section className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-gray-500">Denúncias encontradas</p>
-            <strong className="text-2xl">{filtradas.length}</strong>
+        <section className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
+            <p className="text-sm font-bold text-[#D1C6A8]">Denúncias encontradas</p>
+            <strong className="mt-2 block text-3xl text-[#FAF0D4]">{filtradas.length}</strong>
           </div>
 
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-gray-500">Recebidas</p>
-            <strong className="text-2xl">
+          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
+            <p className="text-sm font-bold text-[#D1C6A8]">Recebidas</p>
+            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
               {filtradas.filter((d) => d.status === 'recebida').length}
             </strong>
           </div>
 
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-gray-500">Em análise</p>
-            <strong className="text-2xl">
+          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
+            <p className="text-sm font-bold text-[#D1C6A8]">Em análise</p>
+            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
               {filtradas.filter((d) => d.status === 'em_analise').length}
             </strong>
           </div>
 
-          <div className="rounded-lg border p-4">
-            <p className="text-sm text-gray-500">Concluídas</p>
-            <strong className="text-2xl">
+          <div className="rounded-xl border border-[#3A5143] bg-[#21382C] p-5">
+            <p className="text-sm font-bold text-[#D1C6A8]">Concluídas</p>
+            <strong className="mt-2 block text-3xl text-[#FAF0D4]">
               {filtradas.filter((d) => d.status === 'concluida').length}
             </strong>
           </div>
         </section>
 
-        <section className="mb-6 rounded-lg border p-4">
+        <section className="mb-8 rounded-xl border border-[#D1C6A8] bg-[#FAF0D4] p-6 text-[#12241B]">
           <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-            <h2 className="text-lg font-semibold">Filtros</h2>
+            <h2 className="text-lg font-bold text-[#12241B]">Filtros</h2>
             <button
               type="button"
               onClick={limparFiltros}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm font-bold text-[#A71E0C] hover:underline"
             >
               Limpar filtros
             </button>
@@ -282,7 +285,7 @@ function Denuncias() {
               value={busca}
               onChange={(e) => setBusca(e.target.value)}
               placeholder="Buscar título"
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             />
 
             <select
@@ -291,7 +294,7 @@ function Denuncias() {
                 setMunicipio(e.target.value)
                 setComunidade('')
               }}
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os municípios</option>
               {municipios.map((m) => (
@@ -302,7 +305,7 @@ function Denuncias() {
             <select
               value={comunidade}
               onChange={(e) => setComunidade(e.target.value)}
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todas as comunidades</option>
               {comunidades.map((c) => (
@@ -313,7 +316,7 @@ function Denuncias() {
             <select
               value={tipo}
               onChange={(e) => setTipo(e.target.value)}
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os tipos</option>
               {Object.entries(TIPOS).map(([valor, nome]) => (
@@ -324,7 +327,7 @@ function Denuncias() {
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
-              className="rounded-md border px-3 py-2"
+              className="w-full rounded-lg border border-[#D1C6A8] bg-white px-3 py-2 text-[#12241B] outline-none focus:border-[#A71E0C]"
             >
               <option value="">Todos os status</option>
               {Object.entries(STATUS).map(([valor, nome]) => (
@@ -339,9 +342,9 @@ function Denuncias() {
             <h2 className="mb-3 text-lg font-semibold">Mapa das denúncias</h2>
             <div
               ref={mapaRef}
-              className="h-[500px] w-full rounded-lg border"
+              className="h-[500px] w-full rounded-xl border border-[#3A5143] overflow-hidden"
             />
-            <p className="mt-2 text-sm text-gray-500">
+            <p className="mt-2 text-[#FAF0D4]">
               {comLocalizacao.length} denúncia(s) com localização no mapa.
             </p>
           </div>
@@ -369,10 +372,10 @@ function Denuncias() {
               {!carregando && filtradas.map((d) => (
                 <article
                   key={d.id}
-                  className="rounded-lg border p-4"
+                  className="rounded-xl border border-[#D1C6A8] bg-[#FAF0D4] p-5 text-[#12241B]"
                 >
                   <div className="mb-2 flex items-start justify-between gap-2">
-                    <h3 className="font-semibold">{d.titulo}</h3>
+                    <h3 className="text-base font-bold text-[#12241B]">{d.titulo}</h3>
                     <span
                       className="shrink-0 rounded-full px-2 py-1 text-xs font-medium text-white"
                       style={{ backgroundColor: CORES[d.status] ?? '#64748b' }}
@@ -381,7 +384,7 @@ function Denuncias() {
                     </span>
                   </div>
 
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-[#58695D]">
                     {TIPOS[d.tipo] ?? d.tipo}
                   </p>
 
@@ -389,7 +392,7 @@ function Denuncias() {
                     {d.comunidade ? `${d.comunidade}, ` : ''}{d.municipio}
                   </p>
 
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-[#58695D]">
                     Ocorrido em: {formatarData(d.data_ocorrido)}
                   </p>
 
@@ -397,7 +400,7 @@ function Denuncias() {
                     <button
                       type="button"
                       onClick={() => localizarDenuncia(d)}
-                      className="mt-3 text-sm font-medium text-blue-600 hover:underline"
+                      className="mt-3 text-sm font-bold text-[#A71E0C] hover:underline"
                     >
                       Ver no mapa
                     </button>
@@ -411,7 +414,11 @@ function Denuncias() {
             </div>
           </div>
         </section>
+
+        </div>
       </main>
+
+      <Footer />
     </>
   )
 }
