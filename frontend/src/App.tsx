@@ -11,6 +11,7 @@ import DashboardDenuncias from './pages/DashboardDenuncias'
 import DashboardUsuarios from './pages/DashboardUsuarios'
 import MinhasDenuncias from './pages/MinhasDenuncias'
 import AcompanharDenuncia from './pages/AcompanharDenuncias'
+import ComoFunciona from './pages/ComoFunciona'
 
 const App = () => {
   return (
@@ -22,6 +23,7 @@ const App = () => {
         <Route path='/register' element={<Register/>}/>
         <Route path='/denuncias' element={<Denuncias/>}/>
         <Route path="/register" element={<Register />} />
+        <Route path="/como-funciona" element={<ComoFunciona />} />
         <Route
           path="/dashboard"
           element={

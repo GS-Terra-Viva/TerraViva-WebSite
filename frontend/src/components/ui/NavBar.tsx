@@ -56,7 +56,10 @@ const Navbar = () => {
         </Link>
 
         <Link to="/denuncias" className="text-[#EEE2D0]">
-          Denúncias
+          Territórios
+        </Link>
+        <Link to="/minhas-denuncias" className="text-[#EEE2D0]">
+          Minhas Denúncias
         </Link>
 
         {autenticado ? (
