@@ -109,8 +109,8 @@ export const STATUS_DENUNCIA: Record<StatusDenuncia, string> = {
 
 /** Linha da tabela `denuncias` como o painel a consome. */
 export type DenunciaLista = {
-  mensagem_conclusao: string 
-  mensagem_encaminhamento: string 
+  mensagem_conclusao: string | null
+  mensagem_encaminhamento: string | null
   id: number
   protocolo: string
   tipo: TipoOcorrencia
