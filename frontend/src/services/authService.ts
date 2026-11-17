@@ -24,7 +24,7 @@ export async function login(name: string, password: string): Promise<AppUser | n
   if (!data) return null
 
   if (!VALID_ROLES.includes(data.role) || !data.token) {
-    throw new Error('login_usuario retornou role/token inválido. Confira se a função foi atualizada.')
+    throw new Error('login_usuario retornou role/token inválido.')
   }
 
   localStorage.setItem(SESSION_KEY, JSON.stringify(data))

@@ -11,7 +11,6 @@ export type TipoOcorrencia =
   | 'acesso_servicos'
   | 'outro'
 
-// Os ids precisam ser iguais aos validados em backend/supabase/denuncias.sql
 export const TIPOS_OCORRENCIA: Record<TipoOcorrencia, string> = {
   invasao_territorio: 'Invasão de território',
   desmatamento: 'Desmatamento',

@@ -55,7 +55,6 @@ export function useNovaDenuncia() {
 
     setEnviando(true)
     try {
-      // Grava no Supabase (função criar_denuncia) — só segue se o banco confirmar
       const criada = await criarDenuncia({
         tipo,
         dataOcorrido: data,

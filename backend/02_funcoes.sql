@@ -54,7 +54,6 @@ begin
 end;
 $$;
 
--- reconstruída (não estava na lista que você enviou)
 create or replace function public.logout_usuario(p_token uuid)
 returns void
 language sql

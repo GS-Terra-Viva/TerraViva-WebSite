@@ -26,7 +26,6 @@ const Dashboard = () => {
   const { denuncias, carregando: carregandoDenuncias, erro } = useDenuncias()
   const { usuarios, carregando: carregandoUsuarios, erro: erroMsgUsuarios } = useUsuarios()
 
-  // Usuários são secundários: se falharem, o resto da tela continua funcionando
   const carregando = carregandoDenuncias || carregandoUsuarios
   const erroUsuarios = erroMsgUsuarios !== null
 

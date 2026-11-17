@@ -15,6 +15,7 @@ import AcompanharDenuncia from './pages/AcompanharDenuncias'
 import ComoFunciona from './pages/ComoFunciona'
 import Projeto from './pages/Projeto'
 import ScrollToTop from './components/ScrollToTop'
+import Monitoramento from './pages/Monitoramento'
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
         <Route path="/denuncias" element={<Denuncias />} />
         <Route path="/como-funciona" element={<ComoFunciona />} />
         <Route path="/sobre" element={<Projeto />} />
+        <Route path="/monitoramento" element={<Monitoramento />} />
 
         <Route
           path="/dashboard"

@@ -30,7 +30,7 @@ A plataforma tem cuidado com a segurança de quem relata: a localização exata 
 
 | Item | Link |
 |------|------|
-| Deploy (Vercelgit) | [Terra Viva](https://terra-viva-web-site.vercel.app/) |
+| Deploy (Vercel) | [Terra Viva](https://terra-viva-web-site.vercel.app/) |
 | Repositório (GitHub) | [Terra Viva](https://github.com/GS-Terra-Viva/TerraViva-WebSite) |
 | Wireframe (Figma) | [Terra Viva](https://www.figma.com/design/1W4Yn6NcyE4U3OsfXjuoc5/TERRA-VIVA?node-id=0-1&t=OiL68bkxyJPkbeuI-1) |
 
@@ -80,7 +80,7 @@ TerraViva-WebSite/
 ├── README.md
 ├── .gitignore
 │
-backend/                   <-- scripts SQL do Supabase (ver backend/README.md)
+backend/                   <-- scripts SQL do Supabase
 ├── README.md              # passo a passo para rodar
 ├── 01_tabelas.sql         # usuarios e denuncias
 ├── 02_funcoes.sql         # as 12 funções RPC
