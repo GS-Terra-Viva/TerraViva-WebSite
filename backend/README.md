@@ -81,7 +81,9 @@ Os scripts podem ser reexecutados sem duplicar dados. Se algum falhar, leia a
 mensagem de erro e confirme que os anteriores foram executados antes.
 
 ### 3. Pegar as credenciais
-Em **Project Settings** > **API**, copie:
+Em **Connect** no topo do site, selecione o framework **React** e Variant **Vite**.
+
+Depois é só copiar o **.env** na segunda etapa "Add files"(não precisa seguir a primeira etapa, o projeto já vem com a dependencia do supabase baixada)
 
 - **Project URL**
 - **Publishable key** (também aparece como `anon public`)
