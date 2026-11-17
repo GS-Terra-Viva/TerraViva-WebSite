@@ -14,10 +14,12 @@ import MinhasDenuncias from './pages/MinhasDenuncias'
 import AcompanharDenuncia from './pages/AcompanharDenuncias'
 import ComoFunciona from './pages/ComoFunciona'
 import Projeto from './pages/Projeto'
+import ScrollToTop from './components/ScrollToTop'
 
 const App = () => {
   return (
     <Router>
+      <ScrollToTop/>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />

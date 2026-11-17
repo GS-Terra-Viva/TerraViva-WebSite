@@ -7,6 +7,8 @@ import potesImg from "../assets/pages/home/potes.png";
 import mapaSP from "../assets/pages/home/mapaSP.svg";
 import florestaImg from "../assets/pages/home/floresta.png";
 import indigenaImg from "../assets/pages/home/ind2.png";
+import { Link } from "react-router-dom";
+import IMAGE_HERO from "../assets/pages/home/texto_hero.png"
 
 const Home = () => {
   return (
@@ -22,9 +24,7 @@ const Home = () => {
       >
 
         <div className="absolute top-1/2 right-[12%] -translate-y-1/2">
-          <h1 className="text-[#FAF0D4] text-[clamp(5rem,8vw,11rem)] leading-[0.85] tracking-[-0.04em] font-black" style={{ fontFamily: "'League Spartan', sans-serif" }}>
-            TERRA <br/> VIVA
-          </h1>
+        <img src={IMAGE_HERO} className="w-130 translate-y-26 pointer-events-none select-none" />
         </div>
 
         <div className="pointer-events-none absolute bottom-0 left-0 h-8 w-full"
@@ -45,11 +45,11 @@ const Home = () => {
           <div className="flex flex-col items-start gap-5">
             <p className="text-sm" style={{ color: "#FAF0D4" }}>Respeito ao território. Cuidado com quem relata.
             </p>
-            <a
-               href="/denuncias"
+            <Link
+               to="/nova-denuncia"
                className="rounded-sm bg-[#B3261E] px-8 py-4 text-center text-sm font-bold transition-colors hover:bg-[#D32F2F]" style={{ color: "#FAF0D4" }}>
                 Registrar uma denúncia
-            </a>
+            </Link>
             </div>
         </div> 
 
@@ -268,13 +268,13 @@ const Home = () => {
               Respeito ao território. Cuidado com quem relata.
             </p>
 
-            <a
-              href="/denuncias"
+            <Link
+              to="/nova-denuncia"
               className="rounded-sm bg-[#B3261E] px-8 py-4 text-center text-sm font-bold transition-colors hover:bg-[#D32F2F]"
               style={{ color: "#FAF0D4" }}
             >
               Registrar uma denúncia
-            </a>
+            </Link>
           </div>
 
         </div>
